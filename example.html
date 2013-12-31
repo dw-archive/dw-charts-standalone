@@ -1,0 +1,129 @@
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <!-- hack to allow dynamic locales in d3 -->
+    <script type="text/javascript"> var __locale = 'en'; </script>
+
+    <!-- include dependend libraries -->
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//assets-datawrapper.s3.amazonaws.com/globalize.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js"></script>
+    <script type="text/javascript" src="//assets-datawrapper.s3.amazonaws.com/vendor/d3-light/3.1.7/d3-light.min.js"></script>
+    <script type="text/javascript" src="//assets-datawrapper.s3.amazonaws.com/vendor/chroma-js/0.5.4/chroma.min.js"></script>
+
+    <!-- include the Datawrapper standalone wrapper  -->
+    <script type="text/javascript" src="dw.standalone.js"></script>
+
+    <!-- theme -->
+    <script type="text/javascript" src="themes/default/default.js"></script>
+    <link rel="stylesheet" type="text/css" href="themes/default/default.css">
+
+    <!-- include chart types -->
+    <script type="text/javascript" src="vis/raphael-chart/raphael-chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="vis/raphael-chart/raphael-chart.css">
+    <script type="text/javascript" src="vis/line-chart/line-chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="vis/line-chart/line-chart.css">
+    <script type="text/javascript" src="vis/column-chart/column-chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="vis/column-chart/column-chart.css">
+
+
+    <style type="text/css">
+
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial;
+}
+
+#uniq-visitors {
+    width:700px;
+    height:200px
+}
+
+#avg-time-on-site {
+    width:700px;
+    height:200px
+}
+    </style>
+
+</head>
+<body>
+    <h2>Average time on site</h2>
+    <div id="avg-time-on-site" class="chart"></div>
+
+    <h2>Unique visitors</h2>
+    <div id="uniq-visitors" class="chart"></div>
+
+    <script type="text/javascript">
+
+(function() {
+
+    // display a line chart
+    dw.visualize({
+        type: 'line-chart', // the chart type
+        theme: 'default', // the theme id
+        container: $('#avg-time-on-site'), // a jQuery selector where the chart should be rendered
+        // this is how you would load a CSV data source
+        datasource: dw.datasource.delimited({ url: 'datasets/avg_time_on_site.csv' }),
+        // options provided by the chart type
+        // check http://datawrapper.de/api/visualizations for complete reference
+        options: { 'line-mode': 'curved', 'fill-below': true }
+    });
+
+    // display a column chart
+    dw.visualize({
+        type: 'column-chart',
+        theme: 'default',
+        container: $('#uniq-visitors'),
+        // in this case we connect to a custom data source
+        datasource: fakePiwikAPI('datasets/piwikAPI.json', ['nb_uniq_visitors']),
+    });
+
+    /*
+     * the purpose of this function is to demonstrate how
+     * you can implement additional data sources.
+     */
+    function fakePiwikAPI(url, metrics) {
+        return {
+            /*
+             * the dataset function will be called to trigger the
+             * data load process. it returns a Deferred which will
+             * be resolved with the loaded dw.dataset instance
+             */
+            dataset: function() {
+                // create a Deferred to return later
+                var dfd = $.Deferred();
+                // call some external API or fetch some local data
+                $.getJSON(url, function(data) {
+                    // first we collect all the data values for each column
+                    var columnData = {};
+                    $.each(data, function(date, row) {
+                        if (!columnData.date) columnData.date = [];
+                        columnData.date.push(date);
+                        $.each(row, function(key, value) {
+                            if (!columnData[key]) columnData[key] = [];
+                            columnData[key].push(value);
+                        });
+                    });
+                    // now we create the actual dw.column objects
+                    var columns = [];
+                    $.each(columnData, function(id, data) {
+                        if (id == 'date' || metrics.indexOf(id) >= 0) {
+                            columns.push(dw.column(id, data, id == 'date' ? 'date' : 'number'));
+                        }
+                    });
+                    // and resolve the Deferred passing the loaded dw.dataset
+                    dfd.resolve(dw.dataset(columns));
+                });
+                // return the Deferred promise
+                return dfd.promise();
+            }
+        };
+    };
+
+})();
+
+
+    </script>
+</body>
+</html>
