@@ -1,0 +1,77 @@
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <!-- hack to allow dynamic locales in d3 -->
+    <script type="text/javascript"> var __locale = 'en'; </script>
+
+    <!-- include dependend libraries -->
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//assets-datawrapper.s3.amazonaws.com/globalize.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js"></script>
+    <script type="text/javascript" src="//assets-datawrapper.s3.amazonaws.com/vendor/d3-light/3.1.7/d3-light.min.js"></script>
+    <script type="text/javascript" src="//assets-datawrapper.s3.amazonaws.com/vendor/chroma-js/0.5.4/chroma.min.js"></script>
+
+    <!-- include the Datawrapper core library  -->
+    <script type="text/javascript" src="dw.js"></script>
+
+    <!-- include the Datawrapper standalone wrapper  -->
+    <script type="text/javascript" src="dw.standalone.js"></script>
+
+    <!-- theme -->
+    <script type="text/javascript" src="themes/default/default.js"></script>
+    <link rel="stylesheet" type="text/css" href="themes/default/default.css">
+
+    <!-- include chart types -->
+    <script type="text/javascript" src="vis/raphael-chart/raphael-chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="vis/raphael-chart/raphael-chart.css">
+    <script type="text/javascript" src="vis/pie-chart/pie-chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="vis/pie-chart/pie-chart.css">
+    <script type="text/javascript" src="vis/donut-chart/donut-chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="vis/donut-chart/donut-chart.css">
+    <script type="text/javascript" src="vis/election-donut-chart/election-donut-chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="vis/election-donut-chart/election-donut-chart.css">
+
+
+    <style type="text/css">
+
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial;
+}
+
+#chart {
+    width:700px;
+    height:400px
+}
+    </style>
+
+</head>
+<body>
+    <div id="chart" class="chart"></div>
+
+    <script type="text/javascript">
+
+(function() {
+
+    // display a line chart
+    dw.visualize({
+        type: 'election-donut-chart', // the chart type
+        theme: 'default', // the theme id
+        container: $('#chart'), // a jQuery selector where the chart should be rendered
+        // this is how you would load a CSV data source
+        datasource: dw.datasource.delimited({ url: 'datasets/election.csv' }),
+        options: {
+            'custom-colors': {
+                ABC: 'black',
+                DEF: 'red',
+                GHJ: 'green'
+            }
+        }
+    });
+})();
+
+
+    </script>
+</body>
+</html>
