@@ -1672,7 +1672,7 @@ dw.chart = function(attributes) {
                 .parent()
                 .addClass('vis-'+visualization.id)
                 .addClass('theme-'+theme.id);
-            visualization.render($cont);
+            visualization.render($cont, dataset, visualization.axes(true), theme, chart);
         },
 
         attributes: function(attrs) {
@@ -1845,7 +1845,8 @@ _.extend(dw.visualization.base, {
     },
 
     translate: function(str) {
-        var locale = this.meta.locale, lang = this.lang;
+        var locale = this.meta.locale || {},
+            lang = this.lang;
         return locale[str] ? locale[str][lang] || locale[str] : str;
     },
 
@@ -1976,9 +1977,10 @@ _.extend(dw.visualization.base, {
 
     keys: function() {
         var me = this,
-            axesDef = me.axes();
-        if (axesDef.labels) {
-            var lblCol = me.dataset.column(axesDef.labels),
+            axesDef = me.axes(),
+            highlightKey = me.meta['highlight-key'] || 'labels';
+        if (axesDef[highlightKey]) {
+            var lblCol = me.dataset.column(axesDef[highlightKey]),
                 fmt = me.chart().columnFormatter(lblCol),
                 keys = [];
             lblCol.each(function(val) {
